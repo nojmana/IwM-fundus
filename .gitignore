@@ -31,6 +31,11 @@ wheels/
 *.manifest
 *.spec
 
+# User-specific stuff:
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/dictionaries
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
