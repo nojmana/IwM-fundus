@@ -1,9 +1,11 @@
+import Image_processing
+
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import Frame, Button, Label
+
 from PIL import Image, ImageTk
 from skimage import io
-from skimage.color import rgb2gray
 
 
 class MainWindow(Frame):
@@ -18,8 +20,9 @@ class MainWindow(Frame):
 
         self.input_picture = io.imread(file)
         self.display_picture(Image.fromarray(self.input_picture), 'input')
-        self.display_picture(Image.fromarray(self.input_picture), 'output')
-        self.output_picture = None
+        self.image_processing = Image_processing.ImageProcessing()
+        self.output_picture = self.image_processing.process_picture(self.input_picture)
+        self.display_picture(Image.fromarray(self.output_picture), 'output')
 
     def init_ui(self):
         self.master.title("Detection of fundus blood vessels")
@@ -56,9 +59,9 @@ class MainWindow(Frame):
             label.place(x=700, y=100)
 
     def load_images(self, file):
-        self.input_picture = rgb2gray(io.imread(file))
+        self.input_picture = io.imread(file)
         self.display_picture(Image.fromarray(self.input_picture), 'input')
-        self.display_picture(Image.fromarray(self.input_picture), 'output')
+        self.display_picture(Image.fromarray(self.output_picture), 'output')
 
 
 if __name__ == '__main__':
