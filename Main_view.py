@@ -1,4 +1,5 @@
 import Image_processing
+from Sample import Sample
 
 from tkinter import *
 from tkinter import filedialog
@@ -16,6 +17,7 @@ class MainWindow(Frame):
 
         self.quit_button = Button(self, text="Quit", command=self.quit)
         self.browse_button = Button(self, text="Browse file", command=self.browse)
+        self.sample_button = Button(self, text="Create samples", command=self.sample)
         self.init_ui()
 
         self.input_picture = io.imread(file)
@@ -29,16 +31,20 @@ class MainWindow(Frame):
         self.pack(fill=BOTH, expand=1)
         self.center_window()
 
-        self.quit_button.place(x=1200, y=20)
-        self.browse_button.place(x=1100, y=20)
+        self.quit_button.place(x=985, y=15)
+        self.browse_button.place(x=900, y=15)
+        self.sample_button.place(x=800, y=15)
 
     def center_window(self):
-        w = 1300
-        h = 700
+        w = 1090
+        h = 580
 
         x = (self.master.winfo_screenwidth() - w) / 2
         y = (self.master.winfo_screenheight() - h) / 2
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
+    def sample(self):
+        Sample.create_samples('01_dr.JPG', sample_size=101, step=30, equals_set_sizes=True)
 
     def browse(self):
         file = filedialog.askopenfilename()
@@ -54,9 +60,9 @@ class MainWindow(Frame):
         label = Label(self, image=resized_picture)
         label.image = resized_picture
         if picture_type == 'input':
-            label.place(x=100, y=100)
+            label.place(x=30, y=50)
         elif picture_type == 'output':
-            label.place(x=700, y=100)
+            label.place(x=560, y=50)
 
     def load_images(self, file):
         self.input_picture = io.imread(file)
