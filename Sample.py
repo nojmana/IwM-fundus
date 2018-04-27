@@ -12,6 +12,7 @@ class Sample:
     @staticmethod
     def create_samples(file_name, sample_size, step, equals_set_sizes):
         warnings.filterwarnings("ignore")
+        print(file_name)
 
         # sample_size have to be odd number
         assert sample_size % 2 == 1

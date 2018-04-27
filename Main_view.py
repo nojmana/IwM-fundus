@@ -1,5 +1,8 @@
 import Image_processing
 from Sample import Sample
+import os
+#from os import listdir
+#from os.path import isfile, join
 
 from tkinter import *
 from tkinter import filedialog
@@ -44,7 +47,9 @@ class MainWindow(Frame):
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def sample(self):
-        Sample.create_samples('01_dr.JPG', sample_size=101, step=30, equals_set_sizes=True)
+        file_list = [f for f in os.listdir("pictures/images") if f.split(".")[0][-1] == "h"]
+        for file_name in file_list[:10]:
+            Sample.create_samples(file_name, sample_size=101, step=100, equals_set_sizes=True)
 
     def browse(self):
         file = filedialog.askopenfilename()
