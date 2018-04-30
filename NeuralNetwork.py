@@ -78,9 +78,9 @@ class NeuralNetwork:
         bar.finish()
         predictions = self.model.predict(self.hu)
 
-        predictions = self.normalize(predictions)
+        '''predictions = self.normalize(predictions)
 
-        '''for i in range(len(predictions)):
+        for i in range(len(predictions)):
             if predictions[i] == 0:
                 pass
             else:

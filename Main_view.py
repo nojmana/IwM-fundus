@@ -3,7 +3,7 @@ from Sample import Sample
 from KNN import KNN
 from NeuralNetwork import NeuralNetwork
 import os
-import cv2
+import os.path
 
 from tkinter import *
 from tkinter import filedialog
@@ -11,6 +11,8 @@ from tkinter.ttk import Frame, Button, Label
 
 from PIL import Image, ImageTk
 from skimage import io
+
+import pandas as pd
 
 
 class MainWindow(Frame):
@@ -65,8 +67,12 @@ class MainWindow(Frame):
 
     def sample(self):
         file_list = [f for f in os.listdir(Sample.input_path) if f.split(".")[0][-1] == "h"]
+        all_data_frames = pd.DataFrame(columns=['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'result'])
         for file_name in file_list[:MainWindow.n_file_samples]:
-            Sample.create_samples(file_name, sample_size=MainWindow.sample_size, step=MainWindow.sample_step, equals_set_sizes=True)
+            data_frame = Sample.create_samples2(file_name, sample_size=MainWindow.sample_size, step=MainWindow.sample_step, equals_set_sizes=True)
+            all_data_frames = all_data_frames.append(data_frame)
+        print(all_data_frames)
+        all_data_frames.to_csv('samples.csv', index=False)
 
     def knn_learn(self):
         self.knn = KNN()
