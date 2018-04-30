@@ -3,6 +3,7 @@ from Sample import Sample
 from KNN import KNN
 from NeuralNetwork import NeuralNetwork
 import os
+import cv2
 
 from tkinter import *
 from tkinter import filedialog
@@ -13,6 +14,10 @@ from skimage import io
 
 
 class MainWindow(Frame):
+
+    sample_size = 21
+    sample_step = 100
+    n_file_samples = 4
 
     def __init__(self, root, file):
         super().__init__()
@@ -60,8 +65,8 @@ class MainWindow(Frame):
 
     def sample(self):
         file_list = [f for f in os.listdir(Sample.input_path) if f.split(".")[0][-1] == "h"]
-        for file_name in file_list[:10]:
-            Sample.create_samples(file_name, sample_size=101, step=100, equals_set_sizes=True)
+        for file_name in file_list[:MainWindow.n_file_samples]:
+            Sample.create_samples(file_name, sample_size=MainWindow.sample_size, step=MainWindow.sample_step, equals_set_sizes=True)
 
     def knn_learn(self):
         self.knn = KNN()
@@ -73,8 +78,8 @@ class MainWindow(Frame):
         print(knn.predict([[4, 2]]))"""
 
     def knn_predict(self):
-        pass
-        # result = self.knn.predict(self.file, sample_size=101)
+        #pass
+        result = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
 
     def nn_train(self):
         self.nn = NeuralNetwork()
@@ -83,7 +88,14 @@ class MainWindow(Frame):
     def nn_predict(self):
         if self.nn is None:
             self.nn = NeuralNetwork()
-        self.nn.predict(self.file, sample_size=101)
+        predicted = self.nn.predict(self.file, sample_size=MainWindow.sample_size)
+
+        for i in range(len(predicted)):
+            for j in range(len(predicted[i])):
+                if predicted[i][j] != 0:
+                    print(predicted[i][j])
+
+        self.display_picture(Image.fromarray(predicted), 'output')
 
     def browse(self):
         file = filedialog.askopenfilename()

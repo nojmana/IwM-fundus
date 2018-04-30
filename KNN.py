@@ -44,7 +44,7 @@ class KNN:
         self.x = np.reshape(self.x, (int(len(self.x)/7), 7))
         self.knn.fit(self.x, self.y)
         print("KNN.train(): finished! Classifier is ready to work!")
-"""
+
     def predict(self, file, sample_size):
         sample_half = int(sample_size/2)
         img = Image.open(file)
@@ -88,5 +88,3 @@ class KNN:
         io.imsave("01_hhh.jpg", result)
         #result = result * 255
         print("maxval", h*w, "counter", counter)
-
-"""

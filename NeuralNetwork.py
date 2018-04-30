@@ -5,6 +5,7 @@ import os
 from Sample import Sample
 import skimage
 from skimage import io
+import progressbar
 
 
 class NeuralNetwork:
@@ -13,10 +14,15 @@ class NeuralNetwork:
         self.x = np.array([])
         self.y = np.array([]).astype(int)
         self.model = Sequential()
-        self.model.add(Dense(30, input_dim=7, init='uniform', activation='relu'))
-        self.model.add(Dense(30, init='uniform', activation='relu'))
-        self.model.add(Dense(1, init='uniform', activation='sigmoid'))
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.hu =  np.array([])
+
+    def normalize(self, data):
+        maximum = np.amax(data)
+        for i in range(len(data)):
+            for j in range(len(data[i])):
+                if maximum != 0:
+                    data[i][j] = round(data[i][j] / maximum * 255)
+        return data
 
     @staticmethod
     def get_result(file_name):
@@ -24,7 +30,6 @@ class NeuralNetwork:
 
     @staticmethod
     def expand(img, border):
-        #print(img.shape)
         result = np.zeros((img.shape[0]+2*border, img.shape[1]+2*border))
         result[border:img.shape[0]+border, border:img.shape[1]+border] = img
         return result
@@ -43,33 +48,48 @@ class NeuralNetwork:
             self.x = np.append(self.x, skimage.measure.moments_hu(img), axis=0)
             self.y = np.append(self.y, NeuralNetwork.get_result(file_name), axis=0)
         self.x = np.reshape(self.x, (int(len(self.x) / 7), 7))
-        self.model.fit(self.x, self.y, epochs=150, batch_size=10)
+        self.model.add(Dense(30, input_dim=7, init='uniform', activation='relu'))
+        self.model.add(Dense(30, init='uniform', activation='relu'))
+        self.model.add(Dense(1, init='uniform', activation='sigmoid'))
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.fit(self.x, self.y, epochs=5, batch_size=10)
 
-"""
     def predict(self, file, sample_size):
         border = int(sample_size/2)
         img = io.imread(file, as_grey=True)
+        h, w = img.shape
         img = NeuralNetwork.expand(img, border)
-
-        hu = np.array([]) # np.zeros(img.shape)
 
         bar = progressbar.ProgressBar(maxval=img.shape[0],
                                       widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         bar.start()
         counter = 0
 
-        for i in np.arange(img.shape[0]):
-            counter += 1
+        for i in np.arange(h):
             bar.update(counter)
-            for j in np.arange(img.shape[1]):
-                hu = np.append(hu, skimage.measure.moments_hu(img[i:i + sample_size, j:j + sample_size]))
-        hu = np.reshape(hu, img.shape[0], img.shape[1])
-        print(hu)
+            counter += 1
+            for j in np.arange(w):
+                current_hu = skimage.measure.moments_hu(img[i:i + sample_size, j:j + sample_size])
+                self.hu = np.append(self.hu, current_hu)
+        self.hu = np.reshape(self.hu, (int(len(self.hu)/7), 7))
 
-                #hu = skimage.measure.moments_hu(img[i:i + sample_size, j:j + sample_size])
-                #result[i][j] =
+        np.savetxt("hu", self.hu, newline=" ")
 
-"""
+        bar.finish()
+        predictions = self.model.predict(self.hu)
+
+        predictions = self.normalize(predictions)
+
+        '''for i in range(len(predictions)):
+            if predictions[i] == 0:
+                pass
+            else:
+                predictions[i] = 255'''
+
+        predictions = np.reshape(predictions, (h, w))
+
+        return predictions
+
 """ def train(self):
         dataset = np.loadtxt("pima-indians-diabetes.csv", delimiter=",")
         # split into input (X) and output (Y) variables
@@ -82,13 +102,4 @@ class NeuralNetwork:
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.fit(x, y, epochs=150, batch_size=10)
         scores = self.model.evaluate(x, y)
-
-    def predict(self):
-        dataset = np.loadtxt("pima-indians-diabetes.csv", delimiter=",")
-        # split into input (X) and output (Y) variables
-        x = dataset[:, 0:8]
-        predictions = self.model.predict(x)
-        # round predictions
-        rounded = [round(x[0]) for x in predictions]
-        print(rounded)
-        """
+"""
