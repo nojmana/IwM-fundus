@@ -12,14 +12,13 @@ from tkinter.ttk import Frame, Button, Label
 from PIL import Image, ImageTk
 from skimage import io
 
-import pandas as pd
-
 
 class MainWindow(Frame):
 
     sample_size = 21
-    sample_step = 100
-    n_file_samples = 4
+    sample_step = 40
+    n_file_samples = 10
+    sample_path = 'samples.csv'
 
     def __init__(self, root, file):
         super().__init__()
@@ -33,10 +32,10 @@ class MainWindow(Frame):
         self.knn_predict_button = Button(self, text="KNN predict", command=self.knn_predict)
         self.nn_train_button = Button(self, text="Neural Network train", command=self.nn_train)
         self.nn_predict_button = Button(self, text="Neural Network predict", command=self.nn_predict)
+        self.nn_tp_button = Button(self, text="NN train and predict", command=self.nn_tp)
         self.init_ui()
 
         self.input_picture = io.imread(file)
-        # self.input_picture = io.imread(name[0] + "_border." + name[1])
         self.display_picture(Image.fromarray(self.input_picture), 'input')
         self.image_processing = Image_processing.ImageProcessing()
         self.output_picture = self.image_processing.process_picture(self.input_picture)
@@ -56,6 +55,7 @@ class MainWindow(Frame):
         self.knn_predict_button.place(x=640, y=15)
         self.nn_train_button.place(x=500, y=15)
         self.nn_predict_button.place(x=350, y=15)
+        self.nn_tp_button.place(x=220, y=15)
 
     def center_window(self):
         w = 1090
@@ -66,13 +66,8 @@ class MainWindow(Frame):
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def sample(self):
-        file_list = [f for f in os.listdir(Sample.input_path) if f.split(".")[0][-1] == "h"]
-        all_data_frames = pd.DataFrame(columns=['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'result'])
-        for file_name in file_list[:MainWindow.n_file_samples]:
-            data_frame = Sample.create_samples2(file_name, sample_size=MainWindow.sample_size, step=MainWindow.sample_step, equals_set_sizes=True)
-            all_data_frames = all_data_frames.append(data_frame)
-        print(all_data_frames)
-        all_data_frames.to_csv('samples.csv', index=False)
+        Sample.generate_csv(MainWindow.sample_size, MainWindow.sample_step, MainWindow.n_file_samples,
+                            MainWindow.sample_path)
 
     def knn_learn(self):
         self.knn = KNN()
@@ -89,19 +84,18 @@ class MainWindow(Frame):
 
     def nn_train(self):
         self.nn = NeuralNetwork()
-        self.nn.train()
+        self.nn.train(MainWindow.sample_path)
 
     def nn_predict(self):
         if self.nn is None:
-            self.nn = NeuralNetwork()
-        predicted = self.nn.predict(self.file, sample_size=MainWindow.sample_size)
-
-        for i in range(len(predicted)):
-            for j in range(len(predicted[i])):
-                if predicted[i][j] != 0:
-                    print(predicted[i][j])
-
+            print("Neural network has to be trained before prediction!")
+            return
+        predicted = self.nn.predict(self.input_picture, sample_size=MainWindow.sample_size)
         self.display_picture(Image.fromarray(predicted), 'output')
+
+    def nn_tp(self):
+        self.nn_train()
+        self.nn_predict()
 
     def browse(self):
         file = filedialog.askopenfilename()
@@ -129,5 +123,5 @@ class MainWindow(Frame):
 
 if __name__ == '__main__':
     root = Tk()
-    app = MainWindow(root, "pictures/images/01_hh.jpg")
+    app = MainWindow(root, "pictures/images/11_h.jpg")
     root.mainloop()

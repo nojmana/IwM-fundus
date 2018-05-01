@@ -1,66 +1,55 @@
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
-import os
-from Sample import Sample
 import skimage
-from skimage import io
 import progressbar
+from sklearn.utils import shuffle
+import pandas as pd
 
 
 class NeuralNetwork:
+    n_moments_hu = 7
 
     def __init__(self):
         self.x = np.array([])
         self.y = np.array([]).astype(int)
         self.model = Sequential()
-        self.hu =  np.array([])
-
-    def normalize(self, data):
-        maximum = np.amax(data)
-        for i in range(len(data)):
-            for j in range(len(data[i])):
-                if maximum != 0:
-                    data[i][j] = round(data[i][j] / maximum * 255)
-        return data
+        self.hu = np.array([])
 
     @staticmethod
-    def get_result(file_name):
-        return [1] if file_name.split(".")[0][-1] == "y" else [0]
-
-    @staticmethod
-    def expand(img, border):
-        result = np.zeros((img.shape[0]+2*border, img.shape[1]+2*border))
+    def expand(img, border, value):
+        result = np.ones((img.shape[0]+2*border, img.shape[1]+2*border)) * value
         result[border:img.shape[0]+border, border:img.shape[1]+border] = img
         return result
 
-    def train(self):
+    def train(self, file):
         try:
-            img_list = os.listdir(Sample.sample_path)
-            assert len(img_list) > 0
-        except (FileNotFoundError, AssertionError):
+            dataframe = pd.read_csv(file)
+        except FileNotFoundError:
             print("NeuralNetworks.train(): No samples found :(")
             return
+        dataframe = shuffle(dataframe)
+        dataset = dataframe.values
 
-        rand_order_list = np.random.permutation(img_list)
-        for i, file_name in enumerate(rand_order_list):
-            img = io.imread(Sample.sample_path + file_name, as_grey=True)
-            self.x = np.append(self.x, skimage.measure.moments_hu(img), axis=0)
-            self.y = np.append(self.y, NeuralNetwork.get_result(file_name), axis=0)
-        self.x = np.reshape(self.x, (int(len(self.x) / 7), 7))
-        self.model.add(Dense(30, input_dim=7, init='uniform', activation='relu'))
-        self.model.add(Dense(30, init='uniform', activation='relu'))
-        self.model.add(Dense(1, init='uniform', activation='sigmoid'))
+        x = dataset[:, :7].astype(float)
+        y = dataset[:, -1].astype(int)
+
+        self.model.add(Dense(100, input_dim=7, activation='relu'))
+        self.model.add(Dense(100, activation='relu'))
+        self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.model.fit(self.x, self.y, epochs=5, batch_size=10)
+        self.model.fit(x, y, epochs=50)
 
-    def predict(self, file, sample_size):
-        border = int(sample_size/2)
-        img = io.imread(file, as_grey=True)
+    def predict(self, img, sample_size):
+        img = skimage.color.rgb2gray(img)
         h, w = img.shape
-        img = NeuralNetwork.expand(img, border)
+        half_ss = int(sample_size/2)
 
-        bar = progressbar.ProgressBar(maxval=img.shape[0],
+        img = NeuralNetwork.expand(img, half_ss, np.mean(img))
+        hu = np.zeros((h, w, NeuralNetwork.n_moments_hu))
+
+        print('\nCounting moments hu in progress...')
+        bar = progressbar.ProgressBar(maxval=h,
                                       widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         bar.start()
         counter = 0
@@ -69,37 +58,21 @@ class NeuralNetwork:
             bar.update(counter)
             counter += 1
             for j in np.arange(w):
-                current_hu = skimage.measure.moments_hu(img[i:i + sample_size, j:j + sample_size])
-                self.hu = np.append(self.hu, current_hu)
-        self.hu = np.reshape(self.hu, (int(len(self.hu)/7), 7))
-
-        np.savetxt("hu", self.hu, newline=" ")
-
+                hu[i, j] = skimage.measure.moments_hu(img[i:i + sample_size, j:j + sample_size])
         bar.finish()
-        predictions = self.model.predict(self.hu)
 
-        '''predictions = self.normalize(predictions)
+        print('\nPrediction in progress...')
+        result = np.zeros((h, w))
+        bar.start()
+        counter = 0
+        for i in np.arange(h):
+            bar.update(counter)
+            counter += 1
 
-        for i in range(len(predictions)):
-            if predictions[i] == 0:
-                pass
-            else:
-                predictions[i] = 255'''
+            row_result = self.model.predict_classes(hu[i])
+            result[i] = np.concatenate(row_result)
+        bar.finish()
 
-        predictions = np.reshape(predictions, (h, w))
-
-        return predictions
-
-""" def train(self):
-        dataset = np.loadtxt("pima-indians-diabetes.csv", delimiter=",")
-        # split into input (X) and output (Y) variables
-        x = dataset[:, 0:8]
-        y = dataset[:, 8]
-        # print(x, y)
-        self.model.add(Dense(12, input_dim=8, init='uniform', activation='relu'))
-        self.model.add(Dense(8, init='uniform', activation='relu'))
-        self.model.add(Dense(1, init='uniform', activation='sigmoid'))
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.model.fit(x, y, epochs=150, batch_size=10)
-        scores = self.model.evaluate(x, y)
-"""
+        result = (result * 255).astype(int)
+        print('Prediction finished!')
+        return result

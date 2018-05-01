@@ -2,6 +2,7 @@ from skimage import io, color
 import numpy as np
 import skimage
 import pandas as pd
+import os
 
 
 class Sample:
@@ -10,7 +11,20 @@ class Sample:
     output_extension = '.tif'
     sample_path = 'samples/'
 
-    def create_samples2(file_name, sample_size, step, equals_set_sizes):
+
+    @staticmethod
+    def generate_csv(sample_size, sample_step, number_of_files, sample_path):
+        file_list = [f for f in os.listdir(Sample.input_path) if f.split(".")[0][-1] == "h"]
+        all_data_frames = pd.DataFrame(columns=['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'result'])
+        for file_name in file_list[:number_of_files]:
+            data_frame = Sample.create_samples(file_name, sample_size=sample_size,
+                                               step=sample_step, equals_set_sizes=True)
+            all_data_frames = all_data_frames.append(data_frame)
+        all_data_frames.to_csv(sample_path, index=False)
+        print("Csv", sample_path, "is generated!")
+
+    @staticmethod
+    def create_samples(file_name, sample_size, step, equals_set_sizes):
         print(file_name)
         # sample_size has to be odd number
         assert sample_size % 2 == 1
@@ -18,7 +32,6 @@ class Sample:
         name = file_name.split(".")
         output_img = io.imread(Sample.output_path + name[0] + Sample.output_extension)
 
-        pic_counter = 1
         nerve_counter = 0
         not_nerve_counter = 0
         number_of_pics = int((img.shape[0] - sample_size) / step) * int((img.shape[1] - sample_size) / step)
@@ -46,7 +59,6 @@ class Sample:
                 current_hu = np.append(current_hu, result)
                 data_frame.loc[row] = current_hu
                 row += 1
-                pic_counter += 1
         print("All samples are created! Y:", nerve_counter, "N:", not_nerve_counter)
 
         if equals_set_sizes:
@@ -61,10 +73,9 @@ class Sample:
                     current_hu = np.append(current_hu, result)
                     data_frame.loc[row] = current_hu
                     row += 1
-                    pic_counter += 1
                     samples_left -= 1
 
-            print("Completion finished, in total", pic_counter - 1, "images")
+            print("Completion finished, in total", row, "images")
 
         return data_frame
 
