@@ -6,7 +6,6 @@ import skimage.measure
 import progressbar
 from sklearn.neighbors import KNeighborsClassifier
 from PIL import Image, ImageOps
-from matplotlib import pyplot as plt
 
 
 class KNN:

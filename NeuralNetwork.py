@@ -1,10 +1,11 @@
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 import numpy as np
 import skimage
 import progressbar
 from sklearn.utils import shuffle
 import pandas as pd
+import sys
 
 
 class NeuralNetwork:
@@ -34,8 +35,7 @@ class NeuralNetwork:
         x = dataset[:, :7].astype(float)
         y = dataset[:, -1].astype(int)
 
-        self.model.add(Dense(270, input_dim=7, activation='relu'))
-        self.model.add(Dense(270, activation='relu'))
+        self.model.add(Dense(200, input_dim=7, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.fit(x, y, epochs=75)
@@ -50,8 +50,7 @@ class NeuralNetwork:
 
         print('\nCounting moments hu in progress...')
         bar = progressbar.ProgressBar(maxval=h,
-                                      widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-        bar.start()
+                                      widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
         counter = 0
 
         for i in np.arange(h):

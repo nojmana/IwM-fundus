@@ -14,9 +14,10 @@ from skimage import io
 class MainWindow(Frame):
 
     sample_size = 21
-    sample_step = 20
-    n_file_samples = 10
+    number_of_pics = 1200
+    n_file_samples = 15
     sample_path = 'samples.csv'
+    predicted_path = 'predicted.jpg'
 
     def __init__(self, root, file):
         super().__init__()
@@ -64,18 +65,13 @@ class MainWindow(Frame):
         self.master.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def sample(self):
-        Sample.generate_csv(MainWindow.sample_size, MainWindow.sample_step, MainWindow.n_file_samples,
+        Sample.generate_csv(MainWindow.sample_size, MainWindow.number_of_pics, MainWindow.n_file_samples,
                             MainWindow.sample_path)
         print("Creating samples finished!")
 
     def knn_learn(self):
         self.knn = KNN()
         self.knn.train()
-        """knn = KNeighborsClassifier()
-        x = [[1, 1], [2, 1], [2, 2], [0,1], [0,2], [3, 5]]
-        y = [True, False, False, True, True, False]
-        knn.fit(x,y)
-        print(knn.predict([[4, 2]]))"""
 
     def knn_predict(self):
         result = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
@@ -89,6 +85,7 @@ class MainWindow(Frame):
             print("Neural network has to be trained before prediction!")
             return
         predicted = self.nn.predict(self.input_picture, sample_size=MainWindow.sample_size)
+        io.imsave(MainWindow.predicted_path, predicted)
         self.display_picture(Image.fromarray(predicted), 'output')
 
     def nn_tp(self):
@@ -121,5 +118,5 @@ class MainWindow(Frame):
 
 if __name__ == '__main__':
     root = Tk()
-    app = MainWindow(root, "pictures/images/11_h.jpg")
+    app = MainWindow(root, "pictures/images/01_hx.jpg")
     root.mainloop()
