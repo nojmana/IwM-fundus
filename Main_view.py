@@ -2,8 +2,6 @@ import Image_processing
 from Sample import Sample
 from KNN import KNN
 from NeuralNetwork import NeuralNetwork
-import os
-import os.path
 
 from tkinter import *
 from tkinter import filedialog
@@ -16,7 +14,7 @@ from skimage import io
 class MainWindow(Frame):
 
     sample_size = 21
-    sample_step = 40
+    sample_step = 20
     n_file_samples = 10
     sample_path = 'samples.csv'
 
@@ -68,6 +66,7 @@ class MainWindow(Frame):
     def sample(self):
         Sample.generate_csv(MainWindow.sample_size, MainWindow.sample_step, MainWindow.n_file_samples,
                             MainWindow.sample_path)
+        print("Creating samples finished!")
 
     def knn_learn(self):
         self.knn = KNN()
@@ -79,7 +78,6 @@ class MainWindow(Frame):
         print(knn.predict([[4, 2]]))"""
 
     def knn_predict(self):
-        #pass
         result = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
 
     def nn_train(self):

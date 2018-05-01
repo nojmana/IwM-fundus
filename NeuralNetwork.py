@@ -17,7 +17,7 @@ class NeuralNetwork:
         self.hu = np.array([])
 
     @staticmethod
-    def expand(img, border, value):
+    def expand(img, border, value=0):
         result = np.ones((img.shape[0]+2*border, img.shape[1]+2*border)) * value
         result[border:img.shape[0]+border, border:img.shape[1]+border] = img
         return result
@@ -34,18 +34,18 @@ class NeuralNetwork:
         x = dataset[:, :7].astype(float)
         y = dataset[:, -1].astype(int)
 
-        self.model.add(Dense(100, input_dim=7, activation='relu'))
-        self.model.add(Dense(100, activation='relu'))
+        self.model.add(Dense(270, input_dim=7, activation='relu'))
+        self.model.add(Dense(270, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.model.fit(x, y, epochs=50)
+        self.model.fit(x, y, epochs=75)
 
     def predict(self, img, sample_size):
         img = skimage.color.rgb2gray(img)
         h, w = img.shape
         half_ss = int(sample_size/2)
 
-        img = NeuralNetwork.expand(img, half_ss, np.mean(img))
+        img = NeuralNetwork.expand(img, half_ss)
         hu = np.zeros((h, w, NeuralNetwork.n_moments_hu))
 
         print('\nCounting moments hu in progress...')

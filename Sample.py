@@ -21,7 +21,7 @@ class Sample:
                                                step=sample_step, equals_set_sizes=True)
             all_data_frames = all_data_frames.append(data_frame)
         all_data_frames.to_csv(sample_path, index=False)
-        print("Csv", sample_path, "is generated!")
+        print("File", sample_path, "is generated!")
 
     @staticmethod
     def create_samples(file_name, sample_size, step, equals_set_sizes):
