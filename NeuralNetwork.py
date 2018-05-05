@@ -50,7 +50,7 @@ class NeuralNetwork:
 
         print('\nCounting moments hu in progress...')
         bar = progressbar.ProgressBar(maxval=h,
-                                      widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()]).start()
+                                      widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         counter = 0
 
         for i in np.arange(h):
@@ -62,7 +62,6 @@ class NeuralNetwork:
 
         print('\nPrediction in progress...')
         result = np.zeros((h, w))
-        bar.start()
         counter = 0
         for i in np.arange(h):
             bar.update(counter)
@@ -72,6 +71,7 @@ class NeuralNetwork:
             result[i] = np.concatenate(row_result)
         bar.finish()
 
-        result = (result * 255).astype(int)
+        result = (result * 255).astype(np.uint8)
+        print(result)
         print('Prediction finished!')
         return result

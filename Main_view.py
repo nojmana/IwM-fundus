@@ -97,6 +97,7 @@ class MainWindow(Frame):
         if len(file) > 0:
             self.load_images(file)
 
+
     def display_picture(self, picture, picture_type):
         width = 500
         width_percent = width/float(picture.size[0])
@@ -113,6 +114,8 @@ class MainWindow(Frame):
     def load_images(self, file):
         self.input_picture = io.imread(file)
         self.display_picture(Image.fromarray(self.input_picture), 'input')
+        self.image_processing = Image_processing.ImageProcessing()
+        self.output_picture = self.image_processing.process_picture(self.input_picture)
         self.display_picture(Image.fromarray(self.output_picture), 'output')
 
 
