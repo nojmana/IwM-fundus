@@ -5,7 +5,6 @@ import skimage
 import progressbar
 from sklearn.utils import shuffle
 import pandas as pd
-import sys
 
 
 class NeuralNetwork:

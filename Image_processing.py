@@ -31,8 +31,8 @@ class ImageProcessing:
     def process_picture(self, input_picture):
         output_picture = cv2.cvtColor(input_picture, cv2.COLOR_RGB2GRAY)
         output_picture = self.median_filter(output_picture, 3)
-        output_picture = cv2.Canny(output_picture, 40, 40, 3)
-        output_picture = self.gaussian_filter(output_picture, 4)
+        output_picture = cv2.Canny(output_picture, 20, 50)
+        output_picture = self.gaussian_filter(output_picture, 2)
         output_picture = self.hist_normalization(output_picture)
         output_contours, contours, hierarchy = cv2.findContours(output_picture, cv2.RETR_TREE,
                                                                    cv2.CHAIN_APPROX_SIMPLE)

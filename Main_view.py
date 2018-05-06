@@ -71,10 +71,11 @@ class MainWindow(Frame):
 
     def knn_learn(self):
         self.knn = KNN()
-        self.knn.train()
+        self.knn.train(MainWindow.sample_path)
 
     def knn_predict(self):
         result = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
+        self.display_picture(Image.fromarray(result), 'output')
 
     def nn_train(self):
         self.nn = NeuralNetwork()
@@ -96,7 +97,6 @@ class MainWindow(Frame):
         file = filedialog.askopenfilename()
         if len(file) > 0:
             self.load_images(file)
-
 
     def display_picture(self, picture, picture_type):
         width = 500
