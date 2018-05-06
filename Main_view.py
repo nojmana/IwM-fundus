@@ -94,9 +94,9 @@ class MainWindow(Frame):
         self.nn_predict()
 
     def browse(self):
-        file = filedialog.askopenfilename()
-        if len(file) > 0:
-            self.load_images(file)
+        self.file = filedialog.askopenfilename()
+        if len(self.file) > 0:
+            self.load_images(self.file)
 
     def display_picture(self, picture, picture_type):
         width = 500

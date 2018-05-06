@@ -5,6 +5,7 @@ import skimage
 import progressbar
 from sklearn.utils import shuffle
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class NeuralNetwork:
@@ -22,6 +23,23 @@ class NeuralNetwork:
         result[border:img.shape[0]+border, border:img.shape[1]+border] = img
         return result
 
+    def learning_curve(self, history):
+        plt.plot(history.history['acc'])
+        plt.plot(history.history['val_acc'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
+
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
+
     def train(self, file):
         try:
             dataframe = pd.read_csv(file)
@@ -34,10 +52,12 @@ class NeuralNetwork:
         x = dataset[:, :7].astype(float)
         y = dataset[:, -1].astype(int)
 
-        self.model.add(Dense(200, input_dim=7, activation='relu'))
+        self.model.add(Dense(3, input_dim=7, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.model.fit(x, y, epochs=75)
+        history = self.model.fit(x, y, validation_split=0.33, epochs=75, verbose=2)
+
+        self.learning_curve(history)
 
     def predict(self, img, sample_size):
         img = skimage.color.rgb2gray(img)
