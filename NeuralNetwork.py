@@ -40,7 +40,7 @@ class NeuralNetwork:
         plt.legend(['train', 'test'], loc='upper left')
         plt.show()
 
-    def train(self, file):
+    def train(self, file, validation_split, epochs):
         try:
             dataframe = pd.read_csv(file)
         except FileNotFoundError:
@@ -55,7 +55,7 @@ class NeuralNetwork:
         self.model.add(Dense(3, input_dim=7, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        history = self.model.fit(x, y, validation_split=0.33, epochs=75, verbose=2)
+        history = self.model.fit(x, y, validation_split=validation_split, epochs=epochs, verbose=2)
 
         self.learning_curve(history)
 
