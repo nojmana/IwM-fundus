@@ -1,0 +1,24 @@
+KNN
+tp 452656 tn 50483 fp 67359 fn 123391 size 693889
+65.23 7.28 9.71 17.78 
+
+Neural network (1 hidden layer, 30 neurons, 75 epochs) [nn1]
+tp 513407 tn 52637 fp 65205 fn 62640 size 693889
+73.99 7.59 9.4 9.03 
+
+Neural network (2 hidden layers, 2x 30 neurons, 75 epochs) [nn2]
+tp 501570 tn 42813 fp 75029 fn 74477 size 693889
+72.28 6.17 10.81 10.73 
+
+Neural network (1 hidden layer, 30 neurons, 100 epochs) [nn3]
+tp 526728 tn 46286 fp 71556 fn 49319 size 693889
+75.91 6.67 10.31 7.11 
+
+Neural network (1 hidden layer, 300 neurons, 75 epochs) [nn4]
+tp 525033 tn 46639 fp 71203 fn 51014 size 693889
+75.67 6.72 10.26 7.35 
+
+Neural network (1 hidden layer, 30 neurons, 100 epochs, dropout 0.2) [nn5]
+tp 530219 tn 47954 fp 69888 fn 45828 size 693889
+76.41 6.91 10.07 6.6 
+

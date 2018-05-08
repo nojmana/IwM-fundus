@@ -37,5 +37,4 @@ class ImageProcessing:
         output_contours, contours, hierarchy = cv2.findContours(output_picture, cv2.RETR_TREE,
                                                                    cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(input_picture, contours, -1, (255, 255, 255), 3)
-
         return output_picture

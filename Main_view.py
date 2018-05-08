@@ -11,7 +11,7 @@ from tkinter import filedialog
 from tkinter.ttk import Frame, Button, Label
 
 from PIL import Image, ImageTk
-from skimage import io
+from skimage import io, color
 import numpy as np
 
 
@@ -20,8 +20,9 @@ class MainWindow(Frame):
     sample_size = 21
     number_of_pics = 1200
     n_file_samples = 15
-    sample_path = 'samples_huge.csv'
+    sample_path = 'samples.csv'
     predicted_path = 'predicted.jpg'
+    img_path = "pictures/images/01_htp.jpg"
 
     def __init__(self, root, file):
         super().__init__()
@@ -37,6 +38,7 @@ class MainWindow(Frame):
         self.nn_predict_button = Button(self, text="Neural Network predict", command=self.nn_predict)
         self.nn_tp_button = Button(self, text="NN train and predict", command=self.nn_tp)
         self.nn_analysis_button = Button(self, text="NN analysis", command=self.nn_analysis)
+        self.nn_confusion_button = Button(self, text="NN confusion", command=self.nn_confusion)
         self.init_ui()
 
         self.input_picture = io.imread(file)
@@ -53,6 +55,7 @@ class MainWindow(Frame):
         self.nn = None
         self.nn_analysis = None
         self.epochs = 75
+        #self.epochs = 100
         self.validation_split = 0.33
 
     def init_ui(self):
@@ -69,6 +72,7 @@ class MainWindow(Frame):
         self.nn_predict_button.place(x=350, y=15)
         self.nn_tp_button.place(x=220, y=15)
         self.nn_analysis_button.place(x=140, y=15)
+        self.nn_confusion_button.place(x=50, y=15)
 
     def center_window(self):
         w = 1090
@@ -88,8 +92,8 @@ class MainWindow(Frame):
         self.knn.train(MainWindow.sample_path)
 
     def knn_predict(self):
-        self.result = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
-        self.display_picture(Image.fromarray(self.result), 'output')
+        self.predicted = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
+        self.display_picture(Image.fromarray(self.predicted), 'output')
 
     def nn_train(self, validation_split, epochs):
         self.nn = NeuralNetwork()
@@ -127,6 +131,13 @@ class MainWindow(Frame):
         self.nn_train(validation_split=self.validation_split, epochs=self.epochs)
         self.nn_predict()
 
+    def nn_confusion(self):
+        self.nn_analysis = Analysis()
+        path = self.file.split(".")
+        name = path[0].split("/")[-1]
+        original = io.imread(Sample.output_path + name + Sample.output_extension, as_grey=True)
+        self.nn_analysis.confusion(self.predicted, original)
+
     def browse(self):
         self.file = filedialog.askopenfilename()
         if len(self.file) > 0:
@@ -157,5 +168,5 @@ class MainWindow(Frame):
 
 if __name__ == '__main__':
     root = Tk()
-    app = MainWindow(root, "pictures/images/01_hx.jpg")
+    app = MainWindow(root, MainWindow.img_path)
     root.mainloop()
