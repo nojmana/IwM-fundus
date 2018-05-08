@@ -8,24 +8,24 @@ import operator
 
 
 class ImageProcessing:
-    def gaussian_filter(self, picture, sigma):
+    @staticmethod
+    def gaussian_filter(picture, sigma):
         return scipy.ndimage.gaussian_filter(picture, sigma=sigma)
 
-    def median_filter(self, picture, mask):
+    @staticmethod
+    def median_filter(picture, mask):
         return filters.rank.median(picture, np.ones([mask, mask], dtype=np.uint8))
 
-    def hist_normalization(self, picture):
+    @staticmethod
+    def hist_normalization(picture):
         histogram = Image.fromarray(picture).convert("L").histogram()
         lut = []
         for b in range(0, len(histogram), 256):
-            # step size
             step = reduce(operator.add, histogram[b:b + 256]) / 255
-            # create equalization lookup table
             n = 0
             for i in range(256):
                 lut.append(n / step)
                 n = n + histogram[i + b]
-        # map image through lookup table
         return np.asarray(Image.fromarray(picture).point(lut * 1))
 
     def process_picture(self, input_picture):

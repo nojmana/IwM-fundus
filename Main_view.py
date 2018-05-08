@@ -12,7 +12,6 @@ from tkinter.ttk import Frame, Button, Label
 
 from PIL import Image, ImageTk
 from skimage import io, color
-import numpy as np
 
 
 class MainWindow(Frame):
@@ -20,7 +19,7 @@ class MainWindow(Frame):
     sample_size = 21
     number_of_pics = 1200
     n_file_samples = 15
-    sample_path = 'samples.csv'
+    sample_path = 'samples_huge.csv'
     predicted_path = 'predicted.jpg'
     img_path = "pictures/images/01_htp.jpg"
 
@@ -55,7 +54,6 @@ class MainWindow(Frame):
         self.nn = None
         self.nn_analysis = None
         self.epochs = 75
-        #self.epochs = 100
         self.validation_split = 0.33
 
     def init_ui(self):
@@ -95,9 +93,9 @@ class MainWindow(Frame):
         self.predicted = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
         self.display_picture(Image.fromarray(self.predicted), 'output')
 
-    def nn_train(self, validation_split, epochs):
+    def nn_train(self):
         self.nn = NeuralNetwork()
-        self.nn.train(MainWindow.sample_path, validation_split, epochs)
+        self.nn.train(MainWindow.sample_path, self.validation_split, self.epochs)
 
     def nn_predict(self):
         if self.nn is None:
@@ -115,7 +113,8 @@ class MainWindow(Frame):
         epochs = [25, 50, 75, 100]
         squared_errors = []
         for epoch in epochs:
-            self.nn_train(validation_split=self.validation_split, epochs=epoch)
+            self.epochs = epoch
+            self.nn_train()
             self.nn_predict()
             squared_error = self.nn_analysis.mean_squared_error(self.predicted_original, self.predicted)
             squared_errors.append([epoch, squared_error])
@@ -128,7 +127,7 @@ class MainWindow(Frame):
         file.close()
 
     def nn_tp(self):
-        self.nn_train(validation_split=self.validation_split, epochs=self.epochs)
+        self.nn_train()
         self.nn_predict()
 
     def nn_confusion(self):

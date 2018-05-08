@@ -25,7 +25,6 @@ class Sample:
     @staticmethod
     def create_samples(file_name, sample_size, number_of_pics, equals_set_sizes):
         print(file_name)
-        # sample_size has to be odd number
         assert sample_size % 2 == 1
         img = io.imread(Sample.input_path + file_name)
         name = file_name.split(".")

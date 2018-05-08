@@ -53,8 +53,6 @@ class NeuralNetwork:
         y = dataset[:, -1].astype(int)
 
         self.model.add(Dense(30, input_dim=7, activation='relu'))
-        #self.model.add(Dropout(0.2))
-        #self.model.add(Dense(30, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         history = self.model.fit(x, y, validation_split=0.1, epochs=epochs, verbose=2)
