@@ -52,11 +52,11 @@ class NeuralNetwork:
         x = dataset[:, :7].astype(float)
         y = dataset[:, -1].astype(int)
 
-        self.model.add(Dense(3, input_dim=7, activation='relu'))
+        self.model.add(Dense(270, input_dim=7, activation='relu'))
+        self.model.add(Dense(270, activation='relu'))
         self.model.add(Dense(1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        history = self.model.fit(x, y, validation_split=validation_split, epochs=epochs, verbose=2)
-
+        history = self.model.fit(x, y, validation_split=0.1, epochs=epochs, verbose=2)
         self.learning_curve(history)
 
     def predict(self, img, sample_size):

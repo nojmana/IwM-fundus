@@ -20,7 +20,7 @@ class MainWindow(Frame):
     sample_size = 21
     number_of_pics = 1200
     n_file_samples = 15
-    sample_path = 'samples.csv'
+    sample_path = 'samples_huge.csv'
     predicted_path = 'predicted.jpg'
 
     def __init__(self, root, file):
@@ -52,6 +52,8 @@ class MainWindow(Frame):
         self.knn = None
         self.nn = None
         self.nn_analysis = None
+        self.epochs = 75
+        self.validation_split = 0.33
 
     def init_ui(self):
         self.master.title("Detection of fundus blood vessels")
@@ -89,7 +91,7 @@ class MainWindow(Frame):
         self.result = self.knn.predict(self.file, sample_size=MainWindow.sample_size)
         self.display_picture(Image.fromarray(self.result), 'output')
 
-    def nn_train(self, validation_split=0.33, epochs=50):
+    def nn_train(self, validation_split, epochs):
         self.nn = NeuralNetwork()
         self.nn.train(MainWindow.sample_path, validation_split, epochs)
 
@@ -106,10 +108,10 @@ class MainWindow(Frame):
             print("There's no original mask to compare! Analysis cannot be performed.")
             return
         self.nn_analysis = Analysis()
-        epochs = [10, 25, 50, 75, 100]
+        epochs = [25, 50, 75, 100]
         squared_errors = []
         for epoch in epochs:
-            self.nn_train(validation_split=0.33, epochs=epoch)
+            self.nn_train(validation_split=self.validation_split, epochs=epoch)
             self.nn_predict()
             squared_error = self.nn_analysis.mean_squared_error(self.predicted_original, self.predicted)
             squared_errors.append([epoch, squared_error])
@@ -122,7 +124,7 @@ class MainWindow(Frame):
         file.close()
 
     def nn_tp(self):
-        self.nn_train(validation_split=0.33, epochs=50)
+        self.nn_train(validation_split=self.validation_split, epochs=self.epochs)
         self.nn_predict()
 
     def browse(self):
